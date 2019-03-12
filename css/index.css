@@ -1,0 +1,51 @@
+body, html {
+	background: rgb(255, 255, 255);
+}
+
+input[type=text], select {
+	padding: 0;
+	width: 400px;
+	padding: 12px 20px;
+	margin: 8px 0;
+	display: inline-block;
+	border: 1px solid #ccf;
+	border-radius: 4px;
+	box-sizing: border-box;
+}
+
+input[type=submit] {
+	width: 400px;
+	background-color: #3469AC;
+	color: white;
+	padding: 14px 20px;
+	margin: 8px 0;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+}
+
+div {
+	border-radius: 8px;
+	background-color: #f2f2f2;
+	padding: 18px;
+	width: 628px;
+	height: 230px;
+
+	position: absolute;
+	margin: 0 auto;
+ 
+	top: 350px;
+    left: 0;
+    right: 0;
+}
+
+img {
+	position: absolute;
+	padding: 12px;
+
+	top: 20px;
+	right: 12px;
+
+	text-align: right;
+	border-radius: 8px;
+}

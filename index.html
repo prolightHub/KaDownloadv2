@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="css/index.css">
+        <script type="text/javascript" src="libraries/jszip/jszip.js"></script>
+        <script type="text/javascript" src="libraries/jszip/FileSaver.js"></script>
+
+	    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+        <title>Ka downloader</title>
+    </head>
+    <body>
+        <script type="text/javascript" src="js/index.js"></script>
+
+        <script>
+            function onSubmit() 
+            {
+                if(window.prepared)
+                {
+                    return false;
+                }
+
+                user = document.getElementById("user").value || user;
+                email = document.getElementById("email").value || email;
+                kaid = document.getElementById("kaid").value || kaid;
+
+                window.sub = document.getElementById("submit");
+
+                onReady();
+
+                sub.style.textAlign = "left";
+                sub.value = "Downloading!";
+                sub.style.cursor = "default";
+
+                window.prepared = true;
+                return false;
+            }
+        </script>
+
+        <div>
+            <form onsubmit="return onSubmit();" id="f1">
+
+                <input type="text" id="user" name="user" placeholder="Your username">
+                <input type="text" id="email" name="email" placeholder="Your email">
+                <input type="text" id="kaid" name="kaid" placeholder="Your kaid">
+
+                <input type="submit" value="Download" id="submit">
+
+                <img id="preview"/>
+            </form>
+        </div>
+    </body>
+</html>
