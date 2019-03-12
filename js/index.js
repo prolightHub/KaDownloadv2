@@ -1,40 +1,18 @@
 
-//Try to fill in as many as these as you can.
-let user = ""; //url username
-let email = ""; //your email's site
-let kaid = "";//"kaid_1042009894132225686810694"; //your kaid
 
-const type = "projects";//Projects (your khan Academy project's page) or top (in browse projects)
+let user = "";
+let email = "";
+let kaid = "";
+
+const downloadName = "projects";//Projects (your khan Academy project's page) or top (in browse projects)
 
 const limit = 1000;
 const sort = 2;
 
-const downloadName = "" || type; 
-const proxyUrl = "https://cors-anywhere.herokuapp.com/";//You don't need to change this.
+const proxyUrl = "https://cors-anywhere.herokuapp.com/";
 const loadWithJsonInfo = true;
 
-function onReady()
-{
-    if(email.split('@').length >= 2)
-    {
-        email = email.split('@')[1];
-    }
-
-    downloadProjects();
-}
-
-function getUrl(limit, extras)
-{
-    if(type === "top")
-    {
-        return "https://www.khanacademy.org/api/internal/scratchpads/top?limit=" + limit + "&topic_id=xffde7c31&_=1510177446399" + (extras || "");
-    }else{
-        return "https://www.khanacademy.org/api/internal/user/scratchpads?casing=camel" + 
-                "&email=" + user + "%40" + email + "&kaid=" + kaid +
-                "&sort=" + sort + "&page=0&limit=" + limit + "&subject=all&lang=en&_=1547591539967" + (extras || "");
-     }
-}
-
+var nameCache = {};
 let projectStructure = {
     "css" : {
         "index.css" : "https://raw.githubusercontent.com/prolightHub/KaTemplate/master/css/index.css",
@@ -51,17 +29,31 @@ let projectStructure = {
 
 loadCode(projectStructure);
 
-let counted = 0;
-
-/*var loop = window.setInterval(function()
+function onReady()
 {
-    if(counted >= 5)
+    if(email.split('@').length >= 2)
     {
-	   onReady();
-
-        window.clearInterval(loop);
+        email = email.split('@')[1];
     }
-}, 1000 / 60);*/
+    if(kaid !== "" && kaid.indexOf("kaid_") === -1)
+    {
+        kaid = "kaid_" + kaid;
+    }
+
+    downloadProjects();
+}
+
+function getUrl(limit, extras, type)
+{
+    if(type === "top")
+    {
+        return "https://www.khanacademy.org/api/internal/scratchpads/top?limit=" + limit + "&topic_id=xffde7c31&_=1510177446399" + (extras || "");
+    }else{
+        return "https://www.khanacademy.org/api/internal/user/scratchpads?casing=camel" + 
+                "&email=" + user + "%40" + email + "&kaid=" + kaid +
+                "&sort=" + sort + "&page=0&limit=" + limit + "&subject=all&lang=en&_=1547591539967" + (extras || "");
+    }
+}
 
 function downloadProject(url)
 {
@@ -70,7 +62,7 @@ function downloadProject(url)
     console.log("Downloading from " + url);
     ajax(proxyUrl + url, function(html)
     {
-	var code = extractCodeJson(html);
+	   var code = extractCodeJson(html);
 	
         var name = code.scratchpad.title.split(' ').join('_');
         addToZip(zip, name, alignCode(code.scratchpad.revision.code));
@@ -87,7 +79,7 @@ function downloadProjects()
     console.log("Getting Projects Json...");
     sub.value = "Getting Projects Json...";
 
-    var url = getUrl(limit);
+    var url = getUrl(limit, downloadName);
     $.getJSON(proxyUrl + url, function(json)
     {
         console.log(json);
@@ -95,30 +87,25 @@ function downloadProjects()
         projectList = json.scratchpads;
 
         var pZip = new JSZip();
+        var folder = pZip.folder(downloadName.toString() + "-master");
 
-        var zip = pZip.folder(downloadName.toString() + "-master");
         var loaded = 0;
-
         var loadedNames = {};
 
-        var count = 0;
+        var name, code;
+
         json.scratchpads.forEach(function(element, index, array)
         {
-            /*Get rid of weird folder names just in case*/
-            //element.title = element.url;
-            //element.title = element.title.replace("https://www.khanacademy.org/computer-programming/", "");
-            //element.title = element.title.substring(-1, element.title.indexOf('/'));
-
             ajax(proxyUrl + element.url, function(html)
             {
-                var name = "Loading... (" + (++count) + "/" + array.length + ")" + " " + element.title;
+                name = "Loading... (" + (loaded + 1) + "/" + array.length + ")" + " " + element.title;
                 console.log(name);
                 sub.value = name;
 
-                var code = extractCodeJson(html);
+                code = extractCodeJson(html).props;
                 document.getElementById("preview").src = code.scratchpad.imageUrl;
 
-                addToZip(zip, code.scratchpad.title.split(' ').join('_'), 
+                addToZip(folder, code.scratchpad.title.split(' ').join('_'), 
                     alignCode(code.scratchpad.revision.code), code.scratchpad.title,
                     (loadWithJsonInfo) ? JSON.stringify(element) : undefined);
 
@@ -156,26 +143,7 @@ function ajax(url, func)
     .catch(err => console.log(err));
 }
 
-function loadCode(object, onFinish)
-{
-    for(var i in object)
-    {
-        if(typeof object[i] === "object")
-        {
-            loadCode(object[i]);
-        }
-        else if(typeof object[i] === "string")
-        {
-            ajax(proxyUrl + object[i], content => 
-            {
-				counted++;
-                object[i] = content;
-            });
-        }
-    }
-}
 
-var nameCache = {};
 function addToZip(zip, name, code, nameSp, elementJson)
 {
     if(typeof nameCache[name] !== "number")
@@ -210,23 +178,32 @@ function alignCode(code)
     return "function main()\n{\n\n" + code.toString() + "\n\n}\n\ncreateProcessing(main);";
 }
 
-function extractCodeJson(str)
+function extractCode(str)
 {
-    return JSON.parse(str.substring(str.indexOf("children: ReactComponent(") + 25, 
-                                    str.indexOf(", document.getElementById(\"tutorial-content\"))") - 8));
+    var test = "$LAB.queueWait(function() {window[\"./javascript/tutorial-scratchpad-package/scratchpad-page-entry.js\"] = ";
+    var index = str.indexOf(test) + test.length;
+    return str.substring(index, str.indexOf("</script>", index)).slice(0, -2);
 }
 
-function nextString(name) 
-{ 
-    var out = name.match("([0-9]+)");
+function extractCodeJson(str)
+{
+    return JSON.parse(extractCode(str));
+}
 
-    if(out && !isNaN(Number(out[0])))
+function loadCode(object, onFinish)
+{
+    for(var i in object)
     {
-        console.log(true);
-        name = name.replace(" (" + out[0] + ")", " (" + (Number(out[0]) + 1).toString() + ")");
-    }else{
-        name += " (1)";
+        if(typeof object[i] === "object")
+        {
+            loadCode(object[i]);
+        }
+        else if(typeof object[i] === "string")
+        {
+            ajax(proxyUrl + object[i], content => 
+            {
+                object[i] = content;
+            });
+        }
     }
-
-    return name;
 }
