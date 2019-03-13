@@ -1,3 +1,9 @@
-# KaDownload
+# KaDownloadv2
 
-Open **index.html** to begin downloading projects from **Khan Academy**. Go to the **index.js** file to get to the settings to where you can choose what you'd like to download.
+Steps:
+
+1) Download the tool.
+2) Open **index.html**.
+3) Input your **username** (the one in the link to your projects) and **email** or **kaid**. 
+4) Press Download. 
+5) Open your downloads folder and extract the project's zip.
