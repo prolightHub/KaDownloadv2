@@ -107,7 +107,7 @@ function downloadProjects()
 
                 addToZip(folder, code.scratchpad.title.split(' ').join('_'), 
                     code.scratchpad.revision.code, code.scratchpad.title,
-                    (loadWithJsonInfo) ? JSON.stringify(element) : undefined);
+                    (loadWithJsonInfo) ? JSON.stringify(element) : undefined, code);
 
                 loaded++;
             });
@@ -143,7 +143,7 @@ function ajax(url, func)
     .catch(err => console.log(err));
 }
 
-function addToZip(zip, name, code, nameSp, elementJson)
+function addToZip(zip, name, code, nameSp, elementJson, path)
 {
     if(typeof nameCache[name] !== "number")
     {
@@ -167,7 +167,7 @@ function addToZip(zip, name, code, nameSp, elementJson)
             css.file("index.css", projectStructure.css["index.css"]);
 
         var js = img.folder("js");
-            js.file("index.js", alignCode(code));
+            js.file("index.js", alignCode(code, path.scratchpad.width, path.scratchpad.height));
             js.file("loadKa.js", projectStructure.js["loadKa.js"]);
 
         var libraries = img.folder("libraries");
@@ -182,9 +182,14 @@ function addToZip(zip, name, code, nameSp, elementJson)
     }
 }
 
-function alignCode(code)
+function alignCode(code, width, height)
 {
-    return "function main()\n{\n\n" + code.toString() + "\n\n}\n\ncreateProcessing(main);";
+    if(width && height)
+    {
+        return "function main()\n{\n\nsize(" + width + "," + height + ");\n\n\n" + code.toString() + "\n\n}\n\ncreateProcessing(main);";
+    }else{
+        return "function main()\n{\n\n" + code.toString() + "\n\n}\n\ncreateProcessing(main);";
+    }
 }
 
 function extractCode(str)
