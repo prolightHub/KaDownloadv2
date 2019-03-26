@@ -65,7 +65,7 @@ function downloadProject(url)
 	   var code = extractCodeJson(html);
 	
         var name = code.scratchpad.title.split(' ').join('_');
-        addToZip(zip, name, alignCode(code.scratchpad.revision.code));
+        addToZip(zip, name, code.scratchpad.revision.code);
 
         zip.generateAsync({type : "blob"}).then(function(content) 
         {
@@ -106,7 +106,7 @@ function downloadProjects()
                 document.getElementById("preview").src = code.scratchpad.imageUrl;
 
                 addToZip(folder, code.scratchpad.title.split(' ').join('_'), 
-                    alignCode(code.scratchpad.revision.code), code.scratchpad.title,
+                    code.scratchpad.revision.code, code.scratchpad.title,
                     (loadWithJsonInfo) ? JSON.stringify(element) : undefined);
 
                 loaded++;
@@ -143,7 +143,6 @@ function ajax(url, func)
     .catch(err => console.log(err));
 }
 
-
 function addToZip(zip, name, code, nameSp, elementJson)
 {
     if(typeof nameCache[name] !== "number")
@@ -155,17 +154,27 @@ function addToZip(zip, name, code, nameSp, elementJson)
 
     var img = zip.folder(name);
 
-    var css = img.folder("css");
-        css.file("index.css", projectStructure.css["index.css"]);
+    if(code.indexOf("<!DOCTYPE html>") < 64 && code.indexOf("<!DOCTYPE html>") > -1 || 
+       code.indexOf("<!doctype html>") < 64 && code.indexOf("<!doctype html>") > -1)
+    {
+        var css = img.folder("css");
+        var js = img.folder("js");
+        var libraries = img.folder("libraries");
 
-    var js = img.folder("js");
-        js.file("index.js", code);
-        js.file("loadKa.js", projectStructure.js["loadKa.js"]);
+        img.file("index.html", code);
+    }else{
+        var css = img.folder("css");
+            css.file("index.css", projectStructure.css["index.css"]);
 
-    var libraries = img.folder("libraries");
-        libraries.file("processing.js", projectStructure.libraries["processing.js"]);
+        var js = img.folder("js");
+            js.file("index.js", alignCode(code));
+            js.file("loadKa.js", projectStructure.js["loadKa.js"]);
 
-    img.file("index.html", projectStructure["index.html"].replace("Processing Js", nameSp || ""));
+        var libraries = img.folder("libraries");
+            libraries.file("processing.js", projectStructure.libraries["processing.js"]);
+
+        img.file("index.html", projectStructure["index.html"].replace("Processing Js", nameSp || ""));
+    }
 
     if(elementJson)
     {
@@ -202,7 +211,7 @@ function loadCode(object, onFinish)
         {
             ajax(proxyUrl + object[i], content => 
             {
-                object[i] = content;
+                object[i] = content.toString();
             });
         }
     }
