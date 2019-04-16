@@ -96,20 +96,41 @@ function downloadProjects()
 
         json.scratchpads.forEach(function(element, index, array)
         {
-            ajax(proxyUrl + element.url, function(html)
+            // ajax(proxyUrl + element.url, function(html)
+            // {
+            //     name = "Loading... (" + (loaded + 1) + "/" + array.length + ")" + " " + element.title;
+            //     console.log(name);
+            //     sub.value = name;
+
+            //     code = extractCodeJson(html).props;
+            //     document.getElementById("preview").src = code.scratchpad.imageUrl;
+
+            //     addToZip(folder, code.scratchpad.title.split(' ').join('_'), 
+            //         code.scratchpad.revision.code, code.scratchpad.title,
+            //         (loadWithJsonInfo) ? JSON.stringify(element) : undefined, code);
+
+            //     loaded++;
+            // });
+
+            $.ajax(proxyUrl + element.url, 
             {
-                name = "Loading... (" + (loaded + 1) + "/" + array.length + ")" + " " + element.title;
-                console.log(name);
-                sub.value = name;
+                type: 'GET',
+                dataType: 'html',
+                success: function(html) 
+                {
+                    name = "Loading... (" + (loaded + 1) + "/" + array.length + ")" + " " + element.title;
+                    console.log(name);
+                    sub.value = name;
 
-                code = extractCodeJson(html).props;
-                document.getElementById("preview").src = code.scratchpad.imageUrl;
+                    code = extractCodeJson(html).props;
+                    document.getElementById("preview").src = code.scratchpad.imageUrl;
 
-                addToZip(folder, code.scratchpad.title.split(' ').join('_'), 
-                    code.scratchpad.revision.code, code.scratchpad.title,
-                    (loadWithJsonInfo) ? JSON.stringify(element) : undefined, code);
+                    addToZip(folder, code.scratchpad.title.split(' ').join('_'), 
+                        code.scratchpad.revision.code, code.scratchpad.title,
+                        (loadWithJsonInfo) ? JSON.stringify(element) : undefined, code);
 
-                loaded++;
+                    loaded++;
+                }
             });
         });
 
