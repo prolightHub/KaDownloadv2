@@ -50,7 +50,7 @@ function getUrl(limit, extras, type)
         return "https://www.khanacademy.org/api/internal/scratchpads/top?limit=" + limit + "&topic_id=xffde7c31&_=1510177446399" + (extras || "");
     }else{
         return "https://www.khanacademy.org/api/internal/user/scratchpads?casing=camel" + 
-                "&email=" + user + "%40" + email + "&kaid=" + kaid +
+                "&email=" + user + "%40" + email + ((kaid) ? "&kaid=" + kaid : "") +
                 "&sort=" + sort + "&page=0&limit=" + limit + "&subject=all&lang=en&_=1547591539967" + (extras || "");
     }
 }
