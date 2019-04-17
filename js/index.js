@@ -116,6 +116,12 @@ function downloadProjects()
             {
                 type: 'GET',
                 dataType: 'html',
+
+                beforeSend: function(request) 
+                {
+                    // request.setRequestHeader("Authority", authorizationToken);
+                },
+
                 success: function(html) 
                 {
                     name = "Loading... (" + (loaded + 1) + "/" + array.length + ")" + " " + element.title;
@@ -215,9 +221,14 @@ function alignCode(code, width, height)
 
 function extractCode(str)
 {
-    var test = "$LAB.queueWait(function() {window[\"./javascript/tutorial-scratchpad-package/scratchpad-page-entry.js\"] = ";
-    var index = str.indexOf(test) + test.length;
-    return str.substring(index, str.indexOf("</script>", index)).slice(0, -2);
+    // var test = "$LAB.queueWait(function() {window[\"./javascript/tutorial-scratchpad-package/scratchpad-page-entry.js\"] = ";
+    // var index = str.indexOf(test) + test.length;
+    // return str.substring(index, str.indexOf("</script>", index)).slice(0, -2);
+
+            // var test = /\[( )*\"\.\/javascript\/tutorial\-scratchpad\-package\/scratchpad\-page\-entry\.js\"( )*\]( )*\=( )*/;
+        var test = "[\"./javascript/tutorial-scratchpad-package/scratchpad-page-entry.js\"] = ";
+        var index = str.indexOf(test) + test.length;
+        return str.substring(index, str.indexOf("</script>", index));//.slice(0, -2);
 }
 
 function extractCodeJson(str)
