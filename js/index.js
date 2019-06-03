@@ -228,7 +228,7 @@ function extractCode(str)
             // var test = /\[( )*\"\.\/javascript\/tutorial\-scratchpad\-package\/scratchpad\-page\-entry\.js\"( )*\]( )*\=( )*/;
         var test = "[\"./javascript/tutorial-scratchpad-package/scratchpad-page-entry.js\"] = ";
         var index = str.indexOf(test) + test.length;
-        return str.substring(index, str.indexOf("</script>", index));//.slice(0, -2);
+        return str.substring(index, str.indexOf("</script>", index)).slice(0, -2);
 }
 
 function extractCodeJson(str)
